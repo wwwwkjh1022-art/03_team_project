@@ -231,6 +231,11 @@ def stage4_export_yolo_labels(csv_path: str):
     df = pd.read_csv(csv_path)
     cfg = DataConfig()
 
+    # 문자열 라벨 → 정수 class id 매핑
+    labels = sorted(df["label"].unique())
+    label2id = {lab: i for i, lab in enumerate(labels)}
+
+
     out_dir = cfg.processed_dir / "yolo_labels"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -249,7 +254,7 @@ def stage4_export_yolo_labels(csv_path: str):
         h  = bh / img_h
 
         # class_id는 label 그대로 사용 (필요시 label→id 매핑 적용)
-        class_id = row["label"]
+        class_id = label2id[row["label"]]
 
         txt = f"{class_id} {cx:.6f} {cy:.6f} {w:.6f} {h:.6f}"
         txt_path = out_dir / f"{row['sample_id']}.txt"
